@@ -1,6 +1,6 @@
 spring:
   application:
-    name: library-management-system
+    name: booknest-ai
 
   # H2 in-memory database for development
   datasource:
@@ -55,9 +55,9 @@ springdoc:
     operationsSorter: method
     tags-sorter: alpha
   info:
-    title: Library Management System API
+    title: BookNest AI API
     version: 1.0.0
-    description: Complete library management REST API
+    description: Complete BookNest AI REST API
 
 logging:
   level:

@@ -9,9 +9,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(info = @Info(
-        title = "Library Management System API",
+        title = "BookNest AI API",
         version = "1.0.0",
-        description = "Complete REST API for Library Management"
+        description = "Complete REST API for BookNest AI"
 ))
 @SecurityScheme(
         name = "bearerAuth",

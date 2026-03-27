@@ -22,7 +22,7 @@ export default function Navbar({ onMenuClick }) {
       </button>
 
       <div className="hidden lg:block">
-        <h1 className="text-lg font-semibold text-gray-800">Library Management System</h1>
+        <h1 className="text-lg font-semibold text-gray-800">BookNest AI</h1>
       </div>
 
       <div className="flex items-center gap-2">

@@ -45,7 +45,7 @@ export default function LoginPage() {
           <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-2xl shadow-lg mb-4">
             <Library size={32} className="text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Library Management</h1>
+          <h1 className="text-2xl font-bold text-gray-900">BookNest AI</h1>
           <p className="text-gray-500 text-sm mt-1">Sign in to your account</p>
         </div>
 

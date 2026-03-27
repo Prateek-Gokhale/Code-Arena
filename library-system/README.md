@@ -1,10 +1,10 @@
-# 📚 Library Management System
+﻿# ðŸ“š BookNest AI
 
-A full-stack Library Management System built with **Java Spring Boot 3** + **React 18 + Vite + Tailwind CSS**.
+A full-stack BookNest AI built with **Java Spring Boot 3** + **React 18 + Vite + Tailwind CSS**.
 
 ---
 
-## 🏗️ Tech Stack
+## ðŸ—ï¸ Tech Stack
 
 | Layer     | Technology                                          |
 |-----------|-----------------------------------------------------|
@@ -17,7 +17,7 @@ A full-stack Library Management System built with **Java Spring Boot 3** + **Rea
 
 ---
 
-## 🚀 Quick Start
+## ðŸš€ Quick Start
 
 ### Prerequisites
 - Java 17+
@@ -54,7 +54,7 @@ The frontend starts at **http://localhost:5173**
 
 ---
 
-## 🔐 Demo Credentials
+## ðŸ” Demo Credentials
 
 | Role      | Email                    | Password    |
 |-----------|--------------------------|-------------|
@@ -66,85 +66,85 @@ The frontend starts at **http://localhost:5173**
 
 ---
 
-## 📡 API Endpoints
+## ðŸ“¡ API Endpoints
 
 ### Auth
 ```
-POST /api/auth/login          → Login, returns JWT tokens
+POST /api/auth/login          â†’ Login, returns JWT tokens
 ```
 
 ### Books
 ```
-GET    /api/books             → List all books (paginated, searchable)
-GET    /api/books/{id}        → Get book by ID
-POST   /api/books             → Create book (ADMIN only)
-PUT    /api/books/{id}        → Update book (ADMIN only)
-DELETE /api/books/{id}        → Delete book (ADMIN only)
+GET    /api/books             â†’ List all books (paginated, searchable)
+GET    /api/books/{id}        â†’ Get book by ID
+POST   /api/books             â†’ Create book (ADMIN only)
+PUT    /api/books/{id}        â†’ Update book (ADMIN only)
+DELETE /api/books/{id}        â†’ Delete book (ADMIN only)
 ```
 
 ### Members
 ```
-GET    /api/members           → List members (ADMIN/LIBRARIAN)
-GET    /api/members/{id}      → Get member
-POST   /api/members           → Create member (ADMIN)
-PUT    /api/members/{id}      → Update member (ADMIN)
-PATCH  /api/members/{id}/toggle-status → Toggle active status
+GET    /api/members           â†’ List members (ADMIN/LIBRARIAN)
+GET    /api/members/{id}      â†’ Get member
+POST   /api/members           â†’ Create member (ADMIN)
+PUT    /api/members/{id}      â†’ Update member (ADMIN)
+PATCH  /api/members/{id}/toggle-status â†’ Toggle active status
 ```
 
 ### Borrows
 ```
-GET  /api/borrows             → All borrow records
-GET  /api/borrows/overdue     → Overdue borrows
-GET  /api/borrows/user/{id}   → User's borrow history
-POST /api/borrows/issue       → Issue book to member
-POST /api/borrows/{id}/return → Return a book
-POST /api/borrows/update-overdue → Refresh overdue statuses
+GET  /api/borrows             â†’ All borrow records
+GET  /api/borrows/overdue     â†’ Overdue borrows
+GET  /api/borrows/user/{id}   â†’ User's borrow history
+POST /api/borrows/issue       â†’ Issue book to member
+POST /api/borrows/{id}/return â†’ Return a book
+POST /api/borrows/update-overdue â†’ Refresh overdue statuses
 ```
 
 ### Dashboard
 ```
-GET /api/dashboard/stats      → Statistics and reports
+GET /api/dashboard/stats      â†’ Statistics and reports
 ```
 
 ---
 
-## 💡 Business Rules
+## ðŸ’¡ Business Rules
 
 | Rule               | Value                           |
 |--------------------|---------------------------------|
 | Default loan period | 14 days                        |
-| Fine               | ₹5 per overdue day              |
+| Fine               | â‚¹5 per overdue day              |
 | JWT expiry         | 24 hours (access), 7 days (refresh) |
 
 ---
 
-## 🗂️ Project Structure
+## ðŸ—‚ï¸ Project Structure
 
 ```
 library-system/
-├── backend/
-│   ├── pom.xml
-│   └── src/main/java/com/library/
-│       ├── config/          # Security, JWT, OpenAPI, DataSeeder
-│       ├── controller/      # REST controllers
-│       ├── dto/             # Request/Response DTOs
-│       ├── entity/          # JPA entities
-│       ├── exception/       # Global error handling
-│       ├── repository/      # Spring Data JPA repos
-│       ├── service/impl/    # Business logic
-│       └── util/            # JwtUtil
-└── frontend/
-    └── src/
-        ├── api/             # Axios instance + API services
-        ├── components/      # UI & layout components
-        ├── features/auth/   # AuthContext
-        ├── pages/           # Route-level pages
-        └── routes/          # ProtectedRoute
+â”œâ”€â”€ backend/
+â”‚   â”œâ”€â”€ pom.xml
+â”‚   â””â”€â”€ src/main/java/com/library/
+â”‚       â”œâ”€â”€ config/          # Security, JWT, OpenAPI, DataSeeder
+â”‚       â”œâ”€â”€ controller/      # REST controllers
+â”‚       â”œâ”€â”€ dto/             # Request/Response DTOs
+â”‚       â”œâ”€â”€ entity/          # JPA entities
+â”‚       â”œâ”€â”€ exception/       # Global error handling
+â”‚       â”œâ”€â”€ repository/      # Spring Data JPA repos
+â”‚       â”œâ”€â”€ service/impl/    # Business logic
+â”‚       â””â”€â”€ util/            # JwtUtil
+â””â”€â”€ frontend/
+    â””â”€â”€ src/
+        â”œâ”€â”€ api/             # Axios instance + API services
+        â”œâ”€â”€ components/      # UI & layout components
+        â”œâ”€â”€ features/auth/   # AuthContext
+        â”œâ”€â”€ pages/           # Route-level pages
+        â””â”€â”€ routes/          # ProtectedRoute
 ```
 
 ---
 
-## 🌐 Switch to PostgreSQL (Production)
+## ðŸŒ Switch to PostgreSQL (Production)
 
 Update `application.yml`:
 
@@ -163,15 +163,16 @@ spring:
 
 ---
 
-## ✅ Features
+## âœ… Features
 
 - [x] JWT authentication with role-based access (Admin / Librarian / Member)
 - [x] Full CRUD for Books with ISBN validation and copy tracking
 - [x] Member management with activate/suspend
-- [x] Book issue and return with automatic fine calculation (₹5/day)
+- [x] Book issue and return with automatic fine calculation (â‚¹5/day)
 - [x] Overdue tracking and fine management
 - [x] Dashboard with stats, top borrowed books, overdue list
 - [x] Paginated and searchable tables
 - [x] Responsive UI (mobile + desktop)
 - [x] Swagger UI for API documentation
 - [x] H2 in-memory database with seed data
+

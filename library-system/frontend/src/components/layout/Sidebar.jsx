@@ -29,7 +29,7 @@ export default function Sidebar({ open, onClose }) {
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
               <Library size={18} className="text-white" />
             </div>
-            <span className="font-semibold text-gray-900">LibraryMS</span>
+            <span className="font-semibold text-gray-900">BookNest AI</span>
           </div>
           <button onClick={onClose} className="lg:hidden text-gray-400 hover:text-gray-600">
             <X size={18} />
