@@ -1,9 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { ALL_TAGS, PROBLEMS } from "./problems";
 import { evaluateSolution, formatValue } from "./evaluator";
 
 const STORAGE_KEY = "algo_arena_state_v1";
 const DIFFICULTIES = ["All", "Easy", "Medium", "Hard"];
+const NAV_ITEMS = ["Explore", "Problems", "Contest", "Discuss"];
 
 const DIFFICULTY_CLASS = {
   Easy: "difficulty-easy",
@@ -53,6 +54,8 @@ export default function App() {
   const [submissions, setSubmissions] = useState([]);
   const [solvedProblemIds, setSolvedProblemIds] = useState([]);
   const [result, setResult] = useState(null);
+  const [questionTab, setQuestionTab] = useState("description");
+  const [consoleTab, setConsoleTab] = useState("result");
 
   useEffect(() => {
     try {
@@ -145,7 +148,7 @@ export default function App() {
     }
     return submissions
       .filter((entry) => entry.problemId === selectedProblem.id)
-      .slice(0, 8);
+      .slice(0, 12);
   }, [submissions, selectedProblem]);
 
   const solvedCount = solvedProblemIds.length;
@@ -155,6 +158,7 @@ export default function App() {
       return;
     }
 
+    setConsoleTab("result");
     const tests = mode === "run" ? selectedProblem.sampleTests : selectedProblem.hiddenTests;
     const output = evaluateSolution(selectedProblem, currentCode, tests);
 
@@ -216,6 +220,7 @@ export default function App() {
   const handleProblemSelect = (problemId) => {
     setSelectedProblemId(problemId);
     setResult(null);
+    setQuestionTab("description");
   };
 
   const handleCodeReset = () => {
@@ -230,42 +235,53 @@ export default function App() {
   };
 
   return (
-    <div className="app-shell">
-      <header className="topbar">
-        <div>
-          <p className="eyebrow">Interview Practice Platform</p>
-          <h1>AlgoArena</h1>
+    <div className="lc-app">
+      <header className="lc-topbar">
+        <div className="lc-brand">
+          <div className="lc-brand-mark">{"</>"}</div>
+          <div className="lc-brand-copy">
+            <strong>Code Arena</strong>
+            <span>Practice Workspace</span>
+          </div>
         </div>
-        <div className="topbar-metrics">
-          <div className="metric-card">
-            <p>Solved</p>
+
+        <nav className="lc-nav">
+          {NAV_ITEMS.map((item) => (
+            <button key={item} type="button" className={`lc-nav-item ${item === "Problems" ? "active" : ""}`}>
+              {item}
+            </button>
+          ))}
+        </nav>
+
+        <div className="lc-top-stats">
+          <div>
+            <span>Solved</span>
             <strong>
-              {solvedCount} / {PROBLEMS.length}
+              {solvedCount}/{PROBLEMS.length}
             </strong>
           </div>
-          <div className="metric-card">
-            <p>Recent Submissions</p>
+          <div>
+            <span>Submissions</span>
             <strong>{submissions.length}</strong>
           </div>
         </div>
       </header>
 
-      <div className="workspace-grid">
-        <aside className="problem-sidebar">
-          <div className="panel-header">
-            <h2>Problems</h2>
-            <span>{filteredProblems.length} shown</span>
+      <div className="lc-shell">
+        <aside className="lc-problem-rail">
+          <div className="lc-rail-head">
+            <h2>Problemset</h2>
+            <span>{filteredProblems.length}</span>
           </div>
 
-          <div className="filters">
+          <div className="lc-rail-filters">
             <input
               type="text"
-              placeholder="Search by title or number"
+              placeholder="Search by title or #"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
             />
-
-            <div className="filter-row">
+            <div className="lc-filter-row">
               <select
                 value={difficultyFilter}
                 onChange={(event) => setDifficultyFilter(event.target.value)}
@@ -276,7 +292,6 @@ export default function App() {
                   </option>
                 ))}
               </select>
-
               <select value={tagFilter} onChange={(event) => setTagFilter(event.target.value)}>
                 <option value="All">All Tags</option>
                 {ALL_TAGS.map((tag) => (
@@ -288,9 +303,9 @@ export default function App() {
             </div>
           </div>
 
-          <div className="problem-list">
+          <div className="lc-problem-list">
             {filteredProblems.length === 0 && (
-              <div className="empty-list">No problems match your filters.</div>
+              <div className="lc-empty">No matching problems.</div>
             )}
 
             {filteredProblems.map((problem) => {
@@ -300,20 +315,20 @@ export default function App() {
                 <button
                   key={problem.id}
                   type="button"
-                  className={`problem-row ${active ? "active" : ""}`}
+                  className={`lc-problem-row ${active ? "active" : ""}`}
                   onClick={() => handleProblemSelect(problem.id)}
                 >
-                  <div className="problem-row-top">
+                  <div className="lc-row-top">
+                    <span className={`lc-status-dot ${solved ? "solved" : "pending"}`} />
                     <strong>
                       {problem.id}. {problem.title}
                     </strong>
-                    <span className={`badge ${DIFFICULTY_CLASS[problem.difficulty]}`}>
+                  </div>
+                  <div className="lc-row-bottom">
+                    <span className={`lc-badge ${DIFFICULTY_CLASS[problem.difficulty]}`}>
                       {problem.difficulty}
                     </span>
-                  </div>
-                  <div className="problem-row-bottom">
-                    <span>{problem.acceptance} acceptance</span>
-                    <span>{solved ? "Solved" : "Unsolved"}</span>
+                    <span>{problem.acceptance}</span>
                   </div>
                 </button>
               );
@@ -321,46 +336,63 @@ export default function App() {
           </div>
         </aside>
 
-        <main className="main-pane">
+        <main className="lc-main">
           {!selectedProblem && (
-            <section className="card">
+            <section className="lc-panel">
               <h2>No problem selected</h2>
             </section>
           )}
 
           {selectedProblem && (
-            <>
-              <section className="problem-banner card">
-                <div>
-                  <p className="eyebrow">#{selectedProblem.id}</p>
-                  <h2>{selectedProblem.title}</h2>
-                  <div className="tag-row">
-                    <span className={`badge ${DIFFICULTY_CLASS[selectedProblem.difficulty]}`}>
+            <div className="lc-main-split">
+              <section className="lc-panel lc-question-pane">
+                <div className="lc-question-head">
+                  <h1>
+                    {selectedProblem.id}. {selectedProblem.title}
+                  </h1>
+                  <div className="lc-question-meta">
+                    <span className={`lc-badge ${DIFFICULTY_CLASS[selectedProblem.difficulty]}`}>
                       {selectedProblem.difficulty}
                     </span>
+                    <span>{selectedProblem.acceptance} acceptance</span>
+                    <span>
+                      Solved by you: {solvedProblemIds.includes(selectedProblem.id) ? "Yes" : "No"}
+                    </span>
+                  </div>
+                  <div className="lc-tag-row">
                     {selectedProblem.tags.map((tag) => (
-                      <span className="tag-chip" key={tag}>
+                      <span className="lc-tag-chip" key={tag}>
                         {tag}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="function-meta">
-                  <p>Function to implement</p>
-                  <code>{selectedProblem.functionName}(...args)</code>
+
+                <div className="lc-tabs">
+                  <button
+                    type="button"
+                    className={questionTab === "description" ? "active" : ""}
+                    onClick={() => setQuestionTab("description")}
+                  >
+                    Description
+                  </button>
+                  <button
+                    type="button"
+                    className={questionTab === "submissions" ? "active" : ""}
+                    onClick={() => setQuestionTab("submissions")}
+                  >
+                    Submissions
+                  </button>
                 </div>
-              </section>
 
-              <div className="content-grid">
-                <section className="left-column">
-                  <article className="card">
-                    <h3>Description</h3>
-                    <p>{selectedProblem.description}</p>
+                <div className="lc-tab-content">
+                  {questionTab === "description" && (
+                    <div className="lc-description">
+                      <p>{selectedProblem.description}</p>
 
-                    <h4>Examples</h4>
-                    <div className="examples">
+                      <h3>Examples</h3>
                       {selectedProblem.examples.map((example, index) => (
-                        <div className="example" key={`${selectedProblem.id}-example-${index}`}>
+                        <div className="lc-example" key={`${selectedProblem.id}-example-${index}`}>
                           <p>
                             <strong>Input:</strong> {example.input}
                           </p>
@@ -372,145 +404,178 @@ export default function App() {
                           </p>
                         </div>
                       ))}
-                    </div>
 
-                    <h4>Constraints</h4>
-                    <ul className="constraints">
-                      {selectedProblem.constraints.map((constraint) => (
-                        <li key={constraint}>{constraint}</li>
-                      ))}
-                    </ul>
-                  </article>
-
-                  <article className="card">
-                    <h3>Submission History</h3>
-                    {currentProblemSubmissions.length === 0 && (
-                      <p className="muted">No submissions yet for this problem.</p>
-                    )}
-                    {currentProblemSubmissions.length > 0 && (
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Status</th>
-                            <th>Runtime</th>
-                            <th>Memory</th>
-                            <th>When</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {currentProblemSubmissions.map((entry) => (
-                            <tr key={entry.id}>
-                              <td className={getStatusClass(entry.status)}>{entry.status}</td>
-                              <td>{entry.runtimeMs} ms</td>
-                              <td>{entry.memoryMb} MB</td>
-                              <td>{formatDateTime(entry.submittedAt)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    )}
-                  </article>
-                </section>
-
-                <section className="right-column">
-                  <article className="card">
-                    <div className="editor-header">
-                      <h3>Code (JavaScript)</h3>
-                      <button type="button" className="ghost-button" onClick={handleCodeReset}>
-                        Reset Starter
-                      </button>
-                    </div>
-                    <textarea
-                      className="editor"
-                      value={currentCode}
-                      onChange={(event) =>
-                        setDrafts((previous) => ({
-                          ...previous,
-                          [selectedProblem.id]: event.target.value
-                        }))
-                      }
-                      spellCheck={false}
-                    />
-                    <div className="editor-actions">
-                      <button type="button" className="secondary-button" onClick={() => runEvaluation("run")}>
-                        Run Sample Tests
-                      </button>
-                      <button type="button" className="primary-button" onClick={() => runEvaluation("submit")}>
-                        Submit
-                      </button>
-                    </div>
-                  </article>
-
-                  <article className="card">
-                    <h3>Console</h3>
-                    {!result && <p className="muted">Run code to see case-by-case output.</p>}
-
-                    {result?.compileError && (
-                      <div className="result-block">
-                        <p className="status-compile">
-                          <strong>Compile Error</strong>
-                        </p>
-                        <p>{result.compileError}</p>
-                      </div>
-                    )}
-
-                    {result && !result.compileError && (
-                      <div className="result-block">
-                        <p className={getStatusClass(result.status)}>
-                          <strong>{result.mode === "run" ? "Run" : "Submission"}: {result.status}</strong>
-                        </p>
-                        <p>
-                          Passed {result.passedCount} / {result.total} tests
-                        </p>
-                        <p>
-                          Runtime: {result.runtimeMs} ms | Memory: {result.memoryMb} MB
-                        </p>
-
-                        {result.mode === "submit" && result.firstFailure && (
-                          <p>
-                            First failed hidden test: case #{result.firstFailure.caseNumber}
-                          </p>
-                        )}
-
-                        {result.mode === "run" && (
-                          <div className="case-list">
-                            {result.caseResults.map((caseResult) => (
-                              <div
-                                key={`run-case-${caseResult.caseNumber}`}
-                                className={`case-item ${caseResult.passed ? "case-pass" : "case-fail"}`}
-                              >
-                                <p>
-                                  <strong>Case {caseResult.caseNumber}</strong> -{" "}
-                                  {caseResult.passed ? "Passed" : "Failed"}
-                                </p>
-                                <p>Input: {formatValue(caseResult.input)}</p>
-                                <p>Expected: {formatValue(caseResult.expected)}</p>
-                                <p>Actual: {formatValue(caseResult.actual)}</p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </article>
-
-                  <article className="card">
-                    <h3>Recent Activity</h3>
-                    {submissions.length === 0 && <p className="muted">No submissions yet.</p>}
-                    {submissions.length > 0 && (
-                      <ul className="activity-list">
-                        {submissions.slice(0, 6).map((entry) => (
-                          <li key={entry.id}>
-                            <span>{entry.title}</span>
-                            <span className={getStatusClass(entry.status)}>{entry.status}</span>
-                          </li>
+                      <h3>Constraints</h3>
+                      <ul>
+                        {selectedProblem.constraints.map((constraint) => (
+                          <li key={constraint}>{constraint}</li>
                         ))}
                       </ul>
-                    )}
-                  </article>
-                </section>
-              </div>
-            </>
+                    </div>
+                  )}
+
+                  {questionTab === "submissions" && (
+                    <div>
+                      {currentProblemSubmissions.length === 0 && (
+                        <p className="lc-muted">No submissions yet for this problem.</p>
+                      )}
+                      {currentProblemSubmissions.length > 0 && (
+                        <table className="lc-table">
+                          <thead>
+                            <tr>
+                              <th>Status</th>
+                              <th>Runtime</th>
+                              <th>Memory</th>
+                              <th>Submitted</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {currentProblemSubmissions.map((entry) => (
+                              <tr key={entry.id}>
+                                <td className={getStatusClass(entry.status)}>{entry.status}</td>
+                                <td>{entry.runtimeMs} ms</td>
+                                <td>{entry.memoryMb} MB</td>
+                                <td>{formatDateTime(entry.submittedAt)}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </section>
+
+              <section className="lc-panel lc-editor-pane">
+                <div className="lc-editor-toolbar">
+                  <div className="lc-editor-meta">
+                    <span>JavaScript</span>
+                    <code>{selectedProblem.functionName}(...args)</code>
+                  </div>
+                  <button type="button" className="lc-ghost-button" onClick={handleCodeReset}>
+                    Reset
+                  </button>
+                </div>
+
+                <textarea
+                  className="lc-editor"
+                  value={currentCode}
+                  onChange={(event) =>
+                    setDrafts((previous) => ({
+                      ...previous,
+                      [selectedProblem.id]: event.target.value
+                    }))
+                  }
+                  spellCheck={false}
+                />
+
+                <div className="lc-editor-actions">
+                  <button
+                    type="button"
+                    className="lc-secondary-button"
+                    onClick={() => runEvaluation("run")}
+                  >
+                    Run
+                  </button>
+                  <button
+                    type="button"
+                    className="lc-primary-button"
+                    onClick={() => runEvaluation("submit")}
+                  >
+                    Submit
+                  </button>
+                </div>
+
+                <div className="lc-console">
+                  <div className="lc-tabs lc-tabs-compact">
+                    <button
+                      type="button"
+                      className={consoleTab === "result" ? "active" : ""}
+                      onClick={() => setConsoleTab("result")}
+                    >
+                      Test Result
+                    </button>
+                    <button
+                      type="button"
+                      className={consoleTab === "activity" ? "active" : ""}
+                      onClick={() => setConsoleTab("activity")}
+                    >
+                      Activity
+                    </button>
+                  </div>
+
+                  {consoleTab === "result" && (
+                    <div className="lc-console-body">
+                      {!result && <p className="lc-muted">Run code to see output and verdict details.</p>}
+
+                      {result?.compileError && (
+                        <div className="lc-result-block">
+                          <p className="status-compile">
+                            <strong>Compile Error</strong>
+                          </p>
+                          <p>{result.compileError}</p>
+                        </div>
+                      )}
+
+                      {result && !result.compileError && (
+                        <div className="lc-result-block">
+                          <p className={getStatusClass(result.status)}>
+                            <strong>{result.mode === "run" ? "Run" : "Submission"}: {result.status}</strong>
+                          </p>
+                          <p>
+                            Passed {result.passedCount} / {result.total} tests
+                          </p>
+                          <p>
+                            Runtime: {result.runtimeMs} ms | Memory: {result.memoryMb} MB
+                          </p>
+
+                          {result.mode === "submit" && result.firstFailure && (
+                            <p>First failed hidden test: case #{result.firstFailure.caseNumber}</p>
+                          )}
+
+                          {result.mode === "run" && (
+                            <div className="lc-case-list">
+                              {result.caseResults.map((caseResult) => (
+                                <div
+                                  key={`run-case-${caseResult.caseNumber}`}
+                                  className={`lc-case-item ${caseResult.passed ? "pass" : "fail"}`}
+                                >
+                                  <p>
+                                    <strong>Case {caseResult.caseNumber}</strong> -{" "}
+                                    {caseResult.passed ? "Passed" : "Failed"}
+                                  </p>
+                                  <p>Input: {formatValue(caseResult.input)}</p>
+                                  <p>Expected: {formatValue(caseResult.expected)}</p>
+                                  <p>Actual: {formatValue(caseResult.actual)}</p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {consoleTab === "activity" && (
+                    <div className="lc-console-body">
+                      {submissions.length === 0 && <p className="lc-muted">No submissions yet.</p>}
+                      {submissions.length > 0 && (
+                        <ul className="lc-activity-list">
+                          {submissions.slice(0, 10).map((entry) => (
+                            <li key={entry.id}>
+                              <span>
+                                {entry.title} - {formatDateTime(entry.submittedAt)}
+                              </span>
+                              <span className={getStatusClass(entry.status)}>{entry.status}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </section>
+            </div>
           )}
         </main>
       </div>

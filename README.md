@@ -26,10 +26,7 @@ Live app: [https://leetcode-clone-two-tau.vercel.app](https://leetcode-clone-two
 ```text
 .
 ├─ frontend/
-│  ├─ leetcode-clone/        # Main Code Arena app
-│  └─ airline-ui/            # Existing UI from earlier workspace code
-├─ infrastructure/           # Existing microservice infra code
-├─ services/                 # Existing microservice backend code
+│  └─ leetcode-clone/        # Main Code Arena app
 └─ README.md
 ```
 
