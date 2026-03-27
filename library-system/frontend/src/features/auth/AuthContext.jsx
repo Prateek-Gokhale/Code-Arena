@@ -13,14 +13,23 @@ export function AuthProvider({ children }) {
     } catch { return null }
   })
 
-  const login = useCallback(async (email, password) => {
-    const res = await authApi.login({ email, password })
+  const persistAuth = (res) => {
     const { accessToken, refreshToken, ...userInfo } = res.data.data
     localStorage.setItem('accessToken', accessToken)
     localStorage.setItem('refreshToken', refreshToken)
     localStorage.setItem('user', JSON.stringify(userInfo))
     setUser(userInfo)
     return userInfo
+  }
+
+  const login = useCallback(async (email, password) => {
+    const res = await authApi.login({ email, password })
+    return persistAuth(res)
+  }, [])
+
+  const register = useCallback(async (payload) => {
+    const res = await authApi.register(payload)
+    return persistAuth(res)
   }, [])
 
   const logout = useCallback(() => {
@@ -35,7 +44,7 @@ export function AuthProvider({ children }) {
   const isAdminOrLibrarian = isAdmin || isLibrarian
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAdmin, isLibrarian, isMember, isAdminOrLibrarian }}>
+    <AuthContext.Provider value={{ user, login, register, logout, isAdmin, isLibrarian, isMember, isAdminOrLibrarian }}>
       {children}
     </AuthContext.Provider>
   )

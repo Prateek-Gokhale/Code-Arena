@@ -1,21 +1,39 @@
-// FILE: src/pages/BooksPage.jsx
 import { useEffect, useState, useCallback } from 'react'
+import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
+import {
+  Plus, Edit2, Trash2, BookOpen, Eye, ShoppingCart, Bot, Sparkles, X,
+} from 'lucide-react'
 import { booksApi } from '../api/booksApi'
+import { cartApi } from '../api/cartApi'
+import { assistantApi } from '../api/assistantApi'
 import { useAuth } from '../features/auth/AuthContext'
 import Modal from '../components/ui/Modal'
 import ConfirmDialog from '../components/ui/ConfirmDialog'
 import SearchInput from '../components/ui/SearchInput'
 import Pagination from '../components/ui/Pagination'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
-import { useForm } from 'react-hook-form'
-import toast from 'react-hot-toast'
-import { Plus, Edit2, Trash2, BookOpen, Eye } from 'lucide-react'
 
-const INITIAL_BOOK = { title:'', author:'', isbn:'', publisher:'', publishedYear:'', description:'', coverImageUrl:'', totalCopies:1 }
+const INITIAL_BOOK = {
+  title: '',
+  author: '',
+  isbn: '',
+  publisher: '',
+  publishedYear: '',
+  description: '',
+  coverImageUrl: '',
+  totalCopies: 1,
+}
 
 function BookForm({ onSubmit, defaultValues, loading }) {
-  const { register, handleSubmit, formState: { errors }, reset } = useForm({ defaultValues: defaultValues || INITIAL_BOOK })
-  useEffect(() => { reset(defaultValues || INITIAL_BOOK) }, [defaultValues])
+  const { register, handleSubmit, formState: { errors }, reset } = useForm({
+    defaultValues: defaultValues || INITIAL_BOOK,
+  })
+
+  useEffect(() => {
+    reset(defaultValues || INITIAL_BOOK)
+  }, [defaultValues, reset])
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -44,8 +62,12 @@ function BookForm({ onSubmit, defaultValues, loading }) {
         </div>
         <div>
           <label className="label">Total Copies *</label>
-          <input type="number" min={1} className={`input ${errors.totalCopies ? 'border-red-400' : ''}`}
-            {...register('totalCopies', { required: 'Required', min: 1, valueAsNumber: true })} />
+          <input
+            type="number"
+            min={1}
+            className={`input ${errors.totalCopies ? 'border-red-400' : ''}`}
+            {...register('totalCopies', { required: 'Required', min: 1, valueAsNumber: true })}
+          />
           {errors.totalCopies && <p className="text-red-500 text-xs mt-1">{errors.totalCopies.message}</p>}
         </div>
         <div>
@@ -59,7 +81,7 @@ function BookForm({ onSubmit, defaultValues, loading }) {
       </div>
       <div className="flex gap-3 justify-end pt-2">
         <button type="submit" className="btn-primary" disabled={loading}>
-          {loading ? 'Saving…' : defaultValues ? 'Update Book' : 'Add Book'}
+          {loading ? 'Saving...' : defaultValues ? 'Update Book' : 'Add Book'}
         </button>
       </div>
     </form>
@@ -68,30 +90,47 @@ function BookForm({ onSubmit, defaultValues, loading }) {
 
 function BookDetailModal({ book, open, onClose }) {
   if (!book) return null
+  const categories = Array.isArray(book.categories)
+    ? book.categories
+    : (book.categories ? [...book.categories] : [])
+
   return (
     <Modal open={open} onClose={onClose} title="Book Details" size="lg">
       <div className="flex gap-6">
-        {book.coverImageUrl
-          ? <img src={book.coverImageUrl} alt={book.title} className="w-32 h-44 object-cover rounded-lg border border-gray-200 shrink-0" onError={e => { e.target.style.display='none' }} />
-          : <div className="w-32 h-44 bg-blue-50 rounded-lg flex items-center justify-center shrink-0"><BookOpen size={40} className="text-blue-300" /></div>
-        }
+        {book.coverImageUrl ? (
+          <img
+            src={book.coverImageUrl}
+            alt={book.title}
+            className="w-32 h-44 object-cover rounded-lg border border-gray-200 shrink-0"
+            onError={(e) => { e.target.style.display = 'none' }}
+          />
+        ) : (
+          <div className="w-32 h-44 bg-blue-50 rounded-lg flex items-center justify-center shrink-0">
+            <BookOpen size={40} className="text-blue-300" />
+          </div>
+        )}
         <div className="flex-1 space-y-3">
-          <div><h3 className="text-xl font-bold text-gray-900">{book.title}</h3><p className="text-gray-500">by {book.author}</p></div>
+          <div>
+            <h3 className="text-xl font-bold text-gray-900">{book.title}</h3>
+            <p className="text-gray-500">by {book.author}</p>
+          </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div><span className="text-gray-500">ISBN:</span> <span className="font-medium">{book.isbn}</span></div>
-            <div><span className="text-gray-500">Publisher:</span> <span className="font-medium">{book.publisher || '—'}</span></div>
-            <div><span className="text-gray-500">Year:</span> <span className="font-medium">{book.publishedYear || '—'}</span></div>
+            <div><span className="text-gray-500">Publisher:</span> <span className="font-medium">{book.publisher || '-'}</span></div>
+            <div><span className="text-gray-500">Year:</span> <span className="font-medium">{book.publishedYear || '-'}</span></div>
             <div><span className="text-gray-500">Total Copies:</span> <span className="font-medium">{book.totalCopies}</span></div>
-            <div><span className="text-gray-500">Available:</span>
+            <div>
+              <span className="text-gray-500">Available:</span>
               <span className={`font-semibold ml-1 ${book.availableCopies > 0 ? 'text-green-600' : 'text-red-600'}`}>{book.availableCopies}</span>
             </div>
-            <div><span className="text-gray-500">Status:</span>
+            <div>
+              <span className="text-gray-500">Status:</span>
               <span className={`badge ml-1 ${book.available ? 'badge-green' : 'badge-red'}`}>{book.available ? 'Available' : 'Unavailable'}</span>
             </div>
           </div>
-          {book.categories?.size > 0 && (
+          {categories.length > 0 && (
             <div className="flex flex-wrap gap-1">
-              {[...book.categories].map(c => <span key={c} className="badge-blue badge">{c}</span>)}
+              {categories.map((c) => <span key={c} className="badge-blue badge">{c}</span>)}
             </div>
           )}
           {book.description && <p className="text-sm text-gray-600 leading-relaxed border-t pt-3">{book.description}</p>}
@@ -102,7 +141,7 @@ function BookDetailModal({ book, open, onClose }) {
 }
 
 export default function BooksPage() {
-  const { isAdmin } = useAuth()
+  const { isAdmin, isMember } = useAuth()
   const [books, setBooks] = useState([])
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
@@ -114,10 +153,19 @@ export default function BooksPage() {
   const [viewBook, setViewBook] = useState(null)
   const [deleteId, setDeleteId] = useState(null)
 
+  const [cart, setCart] = useState({ items: [], totalItems: 0 })
+  const [cartLoading, setCartLoading] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+
+  const [assistantQuestion, setAssistantQuestion] = useState('')
+  const [assistantAnswer, setAssistantAnswer] = useState('')
+  const [assistantSuggestions, setAssistantSuggestions] = useState([])
+  const [assistantLoading, setAssistantLoading] = useState(false)
+
   const fetchBooks = useCallback(() => {
     setLoading(true)
     booksApi.getAll({ page, size: 10, search: search || undefined })
-      .then(res => {
+      .then((res) => {
         const data = res.data.data
         setBooks(data.content)
         setTotalPages(data.totalPages)
@@ -126,8 +174,18 @@ export default function BooksPage() {
       .finally(() => setLoading(false))
   }, [page, search])
 
+  const fetchCart = useCallback(() => {
+    if (!isMember) return
+    setCartLoading(true)
+    cartApi.getCart()
+      .then((res) => setCart(res.data.data))
+      .catch(() => toast.error('Failed to fetch cart'))
+      .finally(() => setCartLoading(false))
+  }, [isMember])
+
   useEffect(() => { fetchBooks() }, [fetchBooks])
   useEffect(() => { setPage(0) }, [search])
+  useEffect(() => { fetchCart() }, [fetchCart])
 
   const handleSubmit = async (data) => {
     setSaving(true)
@@ -159,6 +217,59 @@ export default function BooksPage() {
     }
   }
 
+  const handleAddToCart = async (book) => {
+    try {
+      await cartApi.addItem({ bookId: book.id, quantity: 1 })
+      toast.success(`Added "${book.title}" to cart`)
+      fetchCart()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to add book to cart')
+    }
+  }
+
+  const handleRemoveFromCart = async (bookId) => {
+    try {
+      await cartApi.removeItem(bookId)
+      toast.success('Removed from cart')
+      fetchCart()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Failed to remove from cart')
+    }
+  }
+
+  const handleCheckout = async () => {
+    setCheckoutLoading(true)
+    try {
+      const res = await cartApi.checkout()
+      const total = res.data?.data?.totalItems || 0
+      toast.success(`Purchase successful! ${total} item(s) purchased`)
+      fetchBooks()
+      fetchCart()
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Checkout failed')
+    } finally {
+      setCheckoutLoading(false)
+    }
+  }
+
+  const handleAskAssistant = async () => {
+    if (!assistantQuestion.trim()) {
+      toast.error('Please enter a question for the assistant')
+      return
+    }
+    setAssistantLoading(true)
+    try {
+      const res = await assistantApi.askBookInfo(assistantQuestion.trim())
+      const data = res.data.data
+      setAssistantAnswer(data.answer || '')
+      setAssistantSuggestions(data.suggestions || [])
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Assistant request failed')
+    } finally {
+      setAssistantLoading(false)
+    }
+  }
+
   const openEdit = (book) => {
     setEditBook(book)
     setShowForm(true)
@@ -169,7 +280,9 @@ export default function BooksPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Books</h2>
-          <p className="text-gray-500 text-sm mt-1">Manage the library catalog</p>
+          <p className="text-gray-500 text-sm mt-1">
+            {isAdmin ? 'Manage the library catalog' : 'Browse, purchase, and ask book questions'}
+          </p>
         </div>
         {isAdmin && (
           <button className="btn-primary" onClick={() => { setEditBook(null); setShowForm(true) }}>
@@ -179,8 +292,88 @@ export default function BooksPage() {
       </div>
 
       <div className="card p-4 flex items-center justify-between gap-4 flex-wrap">
-        <SearchInput value={search} onChange={setSearch} placeholder="Search title, author, ISBN…" />
+        <SearchInput value={search} onChange={setSearch} placeholder="Search title, author, ISBN..." />
         <span className="text-sm text-gray-500">{books.length} books shown</span>
+      </div>
+
+      {isMember && (
+        <div className="card p-4">
+          <div className="flex items-center justify-between gap-3 mb-3">
+            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <ShoppingCart size={18} className="text-blue-600" />
+              Your Cart
+            </h3>
+            <span className="badge-blue badge">{cart.totalItems || 0} item(s)</span>
+          </div>
+
+          {cartLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <div className="space-y-3">
+              {!cart.items?.length && (
+                <p className="text-sm text-gray-500">Your cart is empty. Add books from the list below.</p>
+              )}
+
+              {cart.items?.map((item) => (
+                <div key={item.bookId} className="flex items-center justify-between gap-3 p-3 border border-gray-100 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-900 text-sm">{item.title}</p>
+                    <p className="text-xs text-gray-500">{item.author} • Qty: {item.quantity}</p>
+                  </div>
+                  <button className="btn-secondary !px-2 !py-1" onClick={() => handleRemoveFromCart(item.bookId)}>
+                    <X size={14} /> Remove
+                  </button>
+                </div>
+              ))}
+
+              <div className="pt-2">
+                <button
+                  className="btn-success"
+                  disabled={!cart.items?.length || checkoutLoading}
+                  onClick={handleCheckout}
+                >
+                  <ShoppingCart size={16} />
+                  {checkoutLoading ? 'Purchasing...' : 'Purchase Books'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="card p-4">
+        <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
+          <Bot size={18} className="text-indigo-600" />
+          Book Info Assistant
+        </h3>
+        <div className="space-y-3">
+          <textarea
+            className="input h-24 resize-none"
+            placeholder='Ask things like: "Recommend me a programming book" or "Is Clean Code available?"'
+            value={assistantQuestion}
+            onChange={(e) => setAssistantQuestion(e.target.value)}
+          />
+          <button className="btn-primary" onClick={handleAskAssistant} disabled={assistantLoading}>
+            <Sparkles size={16} />
+            {assistantLoading ? 'Thinking...' : 'Ask Assistant'}
+          </button>
+
+          {assistantAnswer && (
+            <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-sm text-indigo-900">
+              {assistantAnswer}
+            </div>
+          )}
+
+          {!!assistantSuggestions.length && (
+            <div className="flex flex-wrap gap-2">
+              {assistantSuggestions.map((s) => (
+                <span key={s.id} className="badge-blue badge">
+                  {s.title} ({s.availableCopies} available)
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -200,15 +393,23 @@ export default function BooksPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {books.length ? books.map(book => (
+                  {books.length ? books.map((book) => (
                     <tr key={book.id}>
                       <td>
                         <div className="flex items-center gap-3">
-                          {book.coverImageUrl
-                            ? <img src={book.coverImageUrl} alt="" className="w-8 h-10 object-cover rounded border border-gray-200 shrink-0" onError={e => { e.target.style.display='none' }} />
-                            : <div className="w-8 h-10 bg-blue-50 rounded flex items-center justify-center shrink-0"><BookOpen size={14} className="text-blue-400" /></div>
-                          }
-                          <span className="font-medium text-gray-900 max-w-[160px] truncate block">{book.title}</span>
+                          {book.coverImageUrl ? (
+                            <img
+                              src={book.coverImageUrl}
+                              alt=""
+                              className="w-8 h-10 object-cover rounded border border-gray-200 shrink-0"
+                              onError={(e) => { e.target.style.display = 'none' }}
+                            />
+                          ) : (
+                            <div className="w-8 h-10 bg-blue-50 rounded flex items-center justify-center shrink-0">
+                              <BookOpen size={14} className="text-blue-400" />
+                            </div>
+                          )}
+                          <span className="font-medium text-gray-900 max-w-[180px] truncate block">{book.title}</span>
                         </div>
                       </td>
                       <td className="text-gray-600">{book.author}</td>
@@ -224,16 +425,36 @@ export default function BooksPage() {
                       </td>
                       <td>
                         <div className="flex items-center gap-1">
-                          <button onClick={() => setViewBook(book)} className="p-1.5 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="View"><Eye size={16} /></button>
-                          {isAdmin && <>
-                            <button onClick={() => openEdit(book)} className="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Edit"><Edit2 size={16} /></button>
-                            <button onClick={() => setDeleteId(book.id)} className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Delete"><Trash2 size={16} /></button>
-                          </>}
+                          <button onClick={() => setViewBook(book)} className="p-1.5 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors" title="View">
+                            <Eye size={16} />
+                          </button>
+                          {isMember && (
+                            <button
+                              onClick={() => handleAddToCart(book)}
+                              className="p-1.5 rounded-lg text-gray-400 hover:bg-green-50 hover:text-green-600 transition-colors disabled:opacity-40"
+                              title="Add to Cart"
+                              disabled={!book.available}
+                            >
+                              <ShoppingCart size={16} />
+                            </button>
+                          )}
+                          {isAdmin && (
+                            <>
+                              <button onClick={() => openEdit(book)} className="p-1.5 rounded-lg text-gray-400 hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Edit">
+                                <Edit2 size={16} />
+                              </button>
+                              <button onClick={() => setDeleteId(book.id)} className="p-1.5 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors" title="Delete">
+                                <Trash2 size={16} />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
                   )) : (
-                    <tr><td colSpan={7} className="text-center text-gray-400 py-12">No books found</td></tr>
+                    <tr>
+                      <td colSpan={7} className="text-center text-gray-400 py-12">No books found</td>
+                    </tr>
                   )}
                 </tbody>
               </table>
@@ -250,9 +471,13 @@ export default function BooksPage() {
       <BookDetailModal book={viewBook} open={!!viewBook} onClose={() => setViewBook(null)} />
 
       <ConfirmDialog
-        open={!!deleteId} onClose={() => setDeleteId(null)} onConfirm={handleDelete}
-        title="Delete Book" message="Are you sure you want to delete this book? This cannot be undone."
-        confirmLabel="Delete" danger
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Delete Book"
+        message="Are you sure you want to delete this book? This cannot be undone."
+        confirmLabel="Delete"
+        danger
       />
     </div>
   )
