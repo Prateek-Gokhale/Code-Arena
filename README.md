@@ -2,7 +2,7 @@
 
 CodeArena is a full-stack LeetCode-style coding practice platform with a React/Vite/Tailwind frontend, Node/Express API, MongoDB persistence, JWT authentication, Monaco Editor, submissions, progress analytics, and an admin problem manager.
 
-Live frontend: https://leetcode-clone-two-tau.vercel.app
+Live frontend: https://client-r11my2c0z-prateek-gokhales-projects.vercel.app
 
 ## Features
 
