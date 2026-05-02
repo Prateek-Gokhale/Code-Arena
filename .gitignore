@@ -1,9 +1,15 @@
 target/
 node_modules/
 dist/
+client/dist/
+client/node_modules/
+server/node_modules/
+.env
+.env.local
 .idea/
 .vscode/
 *.iml
 .DS_Store
 Thumbs.db
 *.log
+npm-debug.log*

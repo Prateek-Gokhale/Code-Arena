@@ -1,66 +1,110 @@
-﻿# Code Arena
+# CodeArena
 
-A LeetCode-style coding platform built with React + Vite.
+CodeArena is a full-stack LeetCode-style coding practice platform with a React/Vite/Tailwind frontend, Node/Express API, MongoDB persistence, JWT authentication, Monaco Editor, submissions, progress analytics, and an admin problem manager.
 
-Live app: [https://leetcode-clone-two-tau.vercel.app](https://leetcode-clone-two-tau.vercel.app)
+Live frontend: https://leetcode-clone-two-tau.vercel.app
 
-## Project Highlights
+## Features
 
-- Problem catalog with search, difficulty filter, and tag filter
-- Detailed problem view (description, examples, constraints)
-- In-browser JavaScript code editor with starter templates
-- `Run Sample Tests` mode with case-by-case output
-- `Submit` mode with hidden test evaluation
-- Submission history, runtime/memory stats, solved tracking
-- Persistent local state using browser `localStorage`
+- Landing, login, register, problemset, coding workspace, submissions, dashboard, and admin pages
+- LeetCode-inspired split workspace with problem statement, examples, constraints, submissions, Monaco editor, language selector, test cases, result panel, and console output
+- JWT auth with bcrypt password hashing and protected routes
+- Problem model with title, slug, difficulty, tags, description, examples, constraints, starter code, public tests, and hidden tests
+- Submissions stored with language, status, runtime, memory, submitted code, and test result details
+- Dashboard with solved totals, difficulty breakdown, recent submissions, and activity chart
+- Admin CRUD for problems and test cases
+- Judge0 API integration when configured; local JavaScript runner fallback for seeded problems
 
 ## Tech Stack
 
-- React 18
-- Vite 5
-- Plain CSS (responsive custom UI)
-- Vercel (production deployment)
+- Frontend: React 18, Vite, Tailwind CSS, Monaco Editor, React Router, Axios, Recharts
+- Backend: Node.js, Express, MongoDB, Mongoose, JWT, bcrypt, express-validator
+- Code execution: Judge0 API or local JavaScript fallback
 
-## Folder Structure
+## Project Structure
 
 ```text
 .
-├─ frontend/
-│  └─ leetcode-clone/        # Main Code Arena app
-└─ README.md
+├─ client/
+│  ├─ src/
+│  │  ├─ components/
+│  │  ├─ context/
+│  │  ├─ layouts/
+│  │  ├─ pages/
+│  │  ├─ services/
+│  │  └─ utils/
+│  └─ .env.example
+├─ server/
+│  ├─ src/
+│  │  ├─ config/
+│  │  ├─ controllers/
+│  │  ├─ middleware/
+│  │  ├─ models/
+│  │  ├─ routes/
+│  │  ├─ seed/
+│  │  └─ services/
+│  └─ .env.example
+└─ package.json
 ```
 
-## Run Locally
+## Local Setup
+
+1. Install dependencies:
 
 ```powershell
-cd frontend/leetcode-clone
 npm install
+cmd /c npm install --prefix client
+cmd /c npm install --prefix server
+```
+
+2. Create environment files:
+
+```powershell
+Copy-Item client/.env.example client/.env
+Copy-Item server/.env.example server/.env
+```
+
+3. Start MongoDB locally or set `MONGO_URI` in `server/.env`.
+
+4. Seed dummy data:
+
+```powershell
+cmd /c npm run seed --prefix server
+```
+
+Seeded admin account:
+
+```text
+admin@codearena.dev / Admin123!
+```
+
+5. Run the app:
+
+```powershell
 cmd /c npm run dev
 ```
 
-App runs on `http://localhost:5174`.
+Frontend: http://localhost:5173  
+Backend: http://localhost:5000/api/health
+
+## Judge0
+
+JavaScript seed problems run locally when `JUDGE0_KEY` is empty. To enable Python, Java, and C++ execution, add Judge0 values to `server/.env`:
+
+```text
+JUDGE0_URL=https://judge0-ce.p.rapidapi.com
+JUDGE0_KEY=your-key
+JUDGE0_HOST=judge0-ce.p.rapidapi.com
+```
 
 ## Build
 
 ```powershell
-cd frontend/leetcode-clone
-cmd /c npm run build
+cmd /c npm run build --prefix client
 ```
 
-## Deploy
+## Deployment Notes
 
-```powershell
-cd frontend/leetcode-clone
-cmd /c npm run deploy:vercel
-```
-
-## Current Scope
-
-This version is an MVP focused on frontend interview-practice workflows using JavaScript execution in-browser. It is designed so a backend judge service can be added later for secure multi-language execution.
-
-## Next Improvements
-
-1. Backend judge workers (secure sandboxed execution)
-2. Multi-language support (Java, Python, C++, JavaScript)
-3. Authentication, profiles, and streak tracking
-4. Contests, leaderboards, and discussion threads
+- Deploy `client/` to Vercel and set `VITE_API_URL` to the deployed API URL.
+- Deploy `server/` to Render/Railway/Fly/etc. and set `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL`, and optional Judge0 variables.
+- Hidden tests are excluded from public problem API responses and only loaded by admin routes or submit execution.
