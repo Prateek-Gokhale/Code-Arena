@@ -84,7 +84,7 @@ admin@codearena.dev / Admin123!
 cmd /c npm run dev
 ```
 
-Frontend: http://localhost:5173  
+Frontend: http://127.0.0.1:5179  
 Backend: http://localhost:5000/api/health
 
 ## Judge0
