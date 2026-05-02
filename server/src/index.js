@@ -5,7 +5,9 @@ import { connectDB } from "./config/db.js";
 
 const port = process.env.PORT || 5000;
 
-connectDB().then(() => {
+const boot = process.env.MONGO_URI ? connectDB() : Promise.resolve();
+
+boot.then(() => {
   app.listen(port, () => {
     console.log(`CodeArena API running on port ${port}`);
   });

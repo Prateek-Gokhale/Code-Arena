@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes.js";
 import problemRoutes from "./routes/problemRoutes.js";
 import submissionRoutes from "./routes/submissionRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import demoRoutes from "./routes/demoRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 
 export const app = express();
@@ -18,9 +19,13 @@ app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(rateLimit({ windowMs: 60_000, limit: 180 }));
 
 app.get("/api/health", (_req, res) => res.json({ ok: true, service: "CodeArena API" }));
-app.use("/api/auth", authRoutes);
-app.use("/api/problems", problemRoutes);
-app.use("/api/submissions", submissionRoutes);
-app.use("/api/admin", adminRoutes);
+if (process.env.MONGO_URI) {
+  app.use("/api/auth", authRoutes);
+  app.use("/api/problems", problemRoutes);
+  app.use("/api/submissions", submissionRoutes);
+  app.use("/api/admin", adminRoutes);
+} else {
+  app.use("/api", demoRoutes);
+}
 app.use(notFound);
 app.use(errorHandler);

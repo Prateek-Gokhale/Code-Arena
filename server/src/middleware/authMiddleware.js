@@ -10,7 +10,7 @@ export async function protect(req, _res, next) {
       error.statusCode = 401;
       throw error;
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "codearena-demo-secret");
     const user = await User.findById(decoded.id);
     if (!user) {
       const error = new Error("User no longer exists");
@@ -30,7 +30,7 @@ export async function optionalProtect(req, _res, next) {
     const header = req.headers.authorization || "";
     const token = header.startsWith("Bearer ") ? header.slice(7) : null;
     if (!token) return next();
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "codearena-demo-secret");
     req.user = await User.findById(decoded.id);
     next();
   } catch {
